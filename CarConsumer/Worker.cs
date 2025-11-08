@@ -49,7 +49,7 @@ namespace CarConsumer
 			}
 		}
 
-	async Task ProcessEventHandler(ProcessEventArgs eventArgs)
+	async public Task ProcessEventHandler(ProcessEventArgs eventArgs)
 		{
 			CarGpsData? data = null;
 			try
