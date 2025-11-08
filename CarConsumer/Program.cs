@@ -5,6 +5,7 @@ using Azure.Storage.Blobs;
 using CarConsumer;
 using CarConsumer.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Npgsql;
 
 
@@ -15,6 +16,7 @@ var config = new ConfigurationBuilder()
 
 var builder = Host.CreateApplicationBuilder(args);
 builder.Services.AddLogging();
+
 #region Timescale
 string connectionString = config["TIMESCALE_CONN_STRING"] ?? throw new InvalidDataException("REGION env. var. ne obstaja"); ;
 builder.Services.AddDbContextFactory<PostgresContext>(options => options.UseNpgsql(connectionString));
@@ -40,6 +42,39 @@ var processor = new EventProcessorClient(
 builder.Services.AddSingleton(processor);
 builder.Services.AddHostedService<Worker>();
 
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+builder.Logging.AddDebug();
+builder.Logging.SetMinimumLevel(LogLevel.Information);
 
 var host = builder.Build();
+
+var logger = host.Services.GetRequiredService<ILogger<Program>>();
+if (builder.Environment.IsDevelopment())
+{
+	logger.LogInformation("Running in dev mode");
+}
+
+using (var scope = host.Services.CreateScope())
+{
+	var dbContextFactory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<PostgresContext>>();
+	using var dbContext = dbContextFactory.CreateDbContext();
+	try
+	{
+		if (await dbContext.Database.CanConnectAsync())
+		{
+			logger.LogInformation("Connected to timescale.");
+		}
+		else
+		{
+			logger.LogWarning("Can't connect to timescale. ");
+		}
+	}
+	catch (Exception ex)
+	{
+		logger.LogError($"Error connecting to timescale: {ex.Message}");
+	}
+}
+
+
 host.Run();

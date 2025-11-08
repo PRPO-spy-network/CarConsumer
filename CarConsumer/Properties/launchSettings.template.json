@@ -1,0 +1,22 @@
+{
+  "profiles": {
+    "CarConsumer": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      },
+      "dotnetRunMessages": true
+    },
+    "Container (Dockerfile)": {
+      "commandName": "Docker",
+      "environmentVariables": {
+        "TIMESCALE_CONN_STRING": "",
+        "REGION": "EU",
+        "EVENT_HUBS_CONNECTION_STRING": "",
+        "BLOB_CONNECTION_STRING": "",
+        "BLOB_NAME": ""
+      }
+    }
+  },
+  "$schema": "http://json.schemastore.org/launchsettings.json"
+}
