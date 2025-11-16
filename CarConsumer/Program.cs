@@ -7,15 +7,15 @@ using CarConsumer.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Npgsql;
-
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 
 var config = new ConfigurationBuilder()
 	.AddEnvironmentVariables()
 	.Build();
 
-
 var builder = Host.CreateApplicationBuilder(args);
 builder.Services.AddLogging();
+
 
 #region Timescale
 string connectionString = config["TIMESCALE_CONN_STRING"] ?? throw new InvalidDataException("REGION env. var. ne obstaja"); ;
@@ -48,6 +48,7 @@ builder.Logging.AddDebug();
 builder.Logging.SetMinimumLevel(LogLevel.Information);
 
 var host = builder.Build();
+
 
 var logger = host.Services.GetRequiredService<ILogger<Program>>();
 if (builder.Environment.IsDevelopment())
