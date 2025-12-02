@@ -15,14 +15,10 @@ public partial class PostgresContext : DbContext
 
     public virtual DbSet<CarGpsData> CarGpsData { get; set; }
 
-    public virtual DbSet<LookupRegistration> LookupRegistrations { get; set; }
-
-    public virtual DbSet<Registration> Registrations { get; set; }
-
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder
-            .HasPostgresEnum("regiont", new[] { "OTHER", "EU" })
+            //.HasPostgresEnum("regiont", new[] { "OTHER", "EU" })
             .HasPostgresExtension("timescaledb");
 
         modelBuilder.Entity<CarGpsData>(entity =>
@@ -42,31 +38,6 @@ public partial class PostgresContext : DbContext
             entity.Property(e => e.Longitude).HasColumnName("longitude");
         });
 
-        modelBuilder.Entity<LookupRegistration>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("lookup_registration_pkey");
-
-            entity.ToTable("lookup_registration");
-
-            entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.Region)
-                .HasMaxLength(3)
-                .IsFixedLength()
-                .HasColumnName("region");
-        });
-
-        modelBuilder.Entity<Registration>(entity =>
-        {
-            entity.HasKey(e => e.CarId).HasName("registration_pkey");
-
-            entity.ToTable("registration");
-
-            entity.Property(e => e.CarId)
-                .HasMaxLength(8)
-                .IsFixedLength()
-                .HasColumnName("car_id");
-            entity.Property(e => e.RegionId).HasColumnName("region_id");
-        });
         modelBuilder.HasSequence("chunk_constraint_name", "_timescaledb_catalog");
 
         OnModelCreatingPartial(modelBuilder);
